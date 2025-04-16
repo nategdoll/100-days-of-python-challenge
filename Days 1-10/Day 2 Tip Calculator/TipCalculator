@@ -1,0 +1,22 @@
+# Bare Minimum
+# from re import sub
+
+# print("Welcome to the tip calculator!")
+# total = float(sub(r'[^\d.]', '',input("What was the total bill? ")))
+# percent = 1 + (float(input("How much tip would you like to give? 10, 12, or 15? ")) / 100)
+# split = int(input("How many people to split the bill? "))
+# each_pay = (total * percent) / split
+# print(f"Each person should pay: ${each_pay:,.2f}")
+
+# Enhanced
+# My idea for an enhanced is that it won't ask how much you want to give as a precent but will instead give suggested amounts based on the 10, 12, & 15.
+
+from re import sub
+
+print("Welcome to the tip calculator!")
+total = float(sub(r'[^\d.]', '',input("What was the total bill? ")))
+split = int(input("How many people to split the bill? "))
+print(f"Here are some suggestions for each person: \n"+
+      f"\t10% = ${(total * 1.1) / split:,.2f}\n" +
+      f"\t12% = ${(total * 1.12) / split:,.2f}\n" +
+      f"\t15% = ${(total * 1.15) / split:,.2f}")

@@ -1,0 +1,5 @@
+words = (
+    "help", 
+    "apple", 
+    "kiwi"
+)
