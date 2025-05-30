@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import pyperclip
+import json
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 from random import choice, randint, sample, shuffle
@@ -39,21 +40,59 @@ def generate_password():
     pyperclip.copy(generated_password)  # Copy the password to clipboard
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
-PASSWORD_FILE = "Days_21-30/Day_29_Password_Manager/passwords.txt"
+PASSWORD_FILE = "Days_21-30/Day_30_Update_Password_Manager/passwords.json"
 def save_password():
     website = website_entry.get()
     email = email_entry.get()
     password = password_entry.get()
+    new_password_data = { website: {"email": email, "password": password } }
 
     if not website or not email or not password:
         messagebox.showerror(title="Error", message="Please fill in all fields.")
         return
+    
+    try:
 
-    with open(PASSWORD_FILE, "a") as file:
-        file.write(f"{website} | {email} | {password}\n")
-        website_entry.delete(0, tk.END)
-        password_entry.delete(0, tk.END)
-        messagebox.showinfo(title="Success", message="Password saved successfully.")
+        with open(PASSWORD_FILE, "r") as file:
+            json_data = json.load(file)
+            if website in json_data:
+                is_overwrite = messagebox.askyesno(title="Warning", 
+                                               message=f"Password for {website} already exists. Do you want to overwrite it?")
+                if not is_overwrite:
+                    messagebox.showinfo(title="Warning", message="Password not saved.")
+                    return
+    except FileNotFoundError:
+        json_data = {}
+
+    finally:
+        json_data[website] = new_password_data[website]
+
+        with open(PASSWORD_FILE, "w") as file:
+            json.dump(json_data, file, indent=4)
+                
+            website_entry.delete(0, tk.END)
+            password_entry.delete(0, tk.END)
+            messagebox.showinfo(title="Success", message="Password saved successfully.")
+
+# ---------------------------- SEARCH PASSWORD ------------------------------- #
+def search_password():
+    website = website_entry.get()
+
+    if not website:
+        messagebox.showerror(title="Error", message="Please enter a website to search.")
+        return
+    try:
+        with open(PASSWORD_FILE, "r") as file:
+            json_data = json.load(file)
+            if website in json_data:
+                email = json_data[website]["email"]
+                password = json_data[website]["password"]
+                messagebox.showinfo(title=website, message=f"Email: {email}\nPassword: {password}")
+                pyperclip.copy(password)
+            else:
+                messagebox.showerror(title="Error", message=f"No password found for {website}.")
+    except FileNotFoundError:
+        messagebox.showerror(title="Error", message="No data file found.")
 
 
 #----------------------------- Field Validation ------------------------------- #
@@ -69,7 +108,7 @@ validation = window.register(validate_num_only)
 
 # Logo Canvas
 canvas = tk.Canvas(width=200, height=200)
-logo_img = tk.PhotoImage(file="Days 21-30/Day_29_Password_Manager/logo.png")
+logo_img = tk.PhotoImage(file="Days_21-30/Day_30_Update_Password_Manager/logo.png")
 canvas.create_image(100, 100, image=logo_img)
 canvas.grid(column=1, row=0)
 
@@ -115,6 +154,8 @@ password_strength4_entry.grid(column=2, row=7)
 password_strength4_entry.insert(0, "2")  # Default value for number of numbers
 
 # Buttons
+search_button = tk.Button(text="Search", command=search_password, width=14, bg="lightblue")
+search_button.grid(column=2, row=1)
 generate_password_button = tk.Button(text="Generate Password", command=generate_password, width=14)
 generate_password_button.grid(column=2, row=3)
 add_button = tk.Button(text="Add", command=save_password, width=44)
