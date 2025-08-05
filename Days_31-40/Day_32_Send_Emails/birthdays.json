@@ -1,0 +1,9 @@
+{
+    "TODO": "Fill with birthdays you would like to remember",
+    "birthdays": [
+    {
+        "name": "John Doe",
+        "birthday": "YYYY-MM-DD",
+        "email": ""
+    }]
+}
